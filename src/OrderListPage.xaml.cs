@@ -47,8 +47,7 @@ namespace LedaoOrder
                     OrderTime = o.OrderTime,
                     ReceiverPhone = o.Phone,
                     Remark = o.Remark,
-                    TotalAmount = o.TotalPrice,
-                    OrderDetails = o.OrderDetails
+                    TotalAmount = o.TotalPrice
                 });
 
                 dgOrder.ItemsSource = model;
@@ -62,7 +61,7 @@ namespace LedaoOrder
 
             timer = new DispatcherTimer();
             timer.Tick += dispatcherTimer_Tick;
-            timer.Interval = new TimeSpan(0,0,5);
+            timer.Interval = new TimeSpan(0,0,10);
             timer.Start();
         }
 
@@ -95,7 +94,7 @@ namespace LedaoOrder
             Hyperlink link = (Hyperlink)e.OriginalSource;
             OrderListViewModel model = link.DataContext as OrderListViewModel;
             
-            NavigationService.Navigate(new OrderDetailPage(model));
+            NavigationService.Navigate(new OrderDetailPage(model.OrderID));
         }
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
@@ -118,8 +117,7 @@ namespace LedaoOrder
                     OrderTime = o.OrderTime,
                     ReceiverPhone = o.Phone,
                     TotalAmount = o.TotalPrice,
-                    Remark = o.Remark,
-                    OrderDetails = o.OrderDetails
+                    Remark = o.Remark
                 });
 
                 txtTotalCount.Text = string.Format("总订单数：{0}", totalCount);
@@ -151,8 +149,7 @@ namespace LedaoOrder
                     OrderTime = o.OrderTime,
                     ReceiverPhone = o.Phone,
                     TotalAmount = o.TotalPrice,
-                    Remark = o.Remark,
-                    OrderDetails = o.OrderDetails
+                    Remark = o.Remark
                 });
 
                 txtTotalCount.Text = string.Format("总订单数：{0}", totalCount);

@@ -24,29 +24,31 @@ namespace LedaoOrder
         private OrderDetailViewModel detailModel;
         private int numberRowOfOnePage;
 
-        public OrderDetailPage(OrderListViewModel model)
+        public OrderDetailPage(int orderID)
         {
             InitializeComponent();
 
-            if (model.OrderStatus != OrderStatus.Ordered)
+            OrderItem order = OrderProvider.GetOrder(orderID);
+
+            if (order.Status != OrderStatus.Ordered)
             {
                 btnSendOrder.Visibility = System.Windows.Visibility.Hidden;
                 btnPrint.Content = "补打订单";
             }
 
             detailModel = new OrderDetailViewModel();
-            detailModel.OrderID = model.OrderID;
-            detailModel.Receiver = model.Receiver;
-            detailModel.ReceiverPhone = model.ReceiverPhone;
-            detailModel.UserName = model.UserName;
-            detailModel.TotalPrice = model.TotalAmount;
-            detailModel.Address = model.Address;
-            detailModel.OrderTime = model.OrderTime;
-            detailModel.Remark = model.Remark;
+            detailModel.OrderID = order.OrderID;
+            detailModel.Receiver = order.Receiver;
+            detailModel.ReceiverPhone = order.Phone;
+            detailModel.UserName = order.UserName;
+            detailModel.TotalPrice = order.TotalPrice;
+            detailModel.Address = order.Address;
+            detailModel.OrderTime = order.OrderTime;
+            detailModel.Remark = order.Remark;
             detailModel.DetailItems = new List<OrderDetailItemViewModel>();
 
             string amountString = string.Empty;
-            foreach (OrderDetailItem orderDetail in model.OrderDetails)
+            foreach (OrderDetailItem orderDetail in order.OrderDetails)
             {
                 if (orderDetail.Unit == "斤")
                     amountString = string.Format("{0}{1}", orderDetail.Amount, orderDetail.Unit);
