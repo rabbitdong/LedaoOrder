@@ -10,6 +10,14 @@ namespace LedaoOrder
 {
     public class OrderProvider
     {
+        /// <summary>
+        /// 获取订单列表信息
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="currentPageIndex"></param>
+        /// <param name="countEachPage"></param>
+        /// <param name="totalCount"></param>
+        /// <returns></returns>
         public static List<OrderItem> GetPagedOrders(OrderStatus status, int currentPageIndex, int countEachPage, out int totalCount)
         {
             List<jsonorder> jsonorders = GetResouces<List<jsonorder>>("http://yiimod.sinaapp.com/views/a/order.php?r=jsonOrdered&status="+(int)status);
@@ -73,9 +81,16 @@ namespace LedaoOrder
 
             return order;
         }
+
+        /// <summary>
+        /// 对订单进行发货处理
+        /// </summary>
+        /// <param name="orderID"></param>
+        /// <returns></returns>
         public static bool SendOrder(int orderID)
         {
-            return true;
+            bool result = GetResouces<bool>("http://yiimod.sinaapp.com/views/a/order.php?r=jsonSend&oid=" + orderID);
+            return result;
         }
 
         public static T GetResouces<T>(string url) where T : new()
