@@ -20,10 +20,12 @@ namespace LedaoOrder
         /// <returns></returns>
         public static List<OrderItem> GetPagedOrders(OrderStatus status, int currentPageIndex, int countEachPage, out int totalCount)
         {
-            List<jsonorder> jsonorders = GetResouces<List<jsonorder>>("http://yiimod.sinaapp.com/views/a/order.php?r=jsonOrdered&status="+(int)status);
+            totalCount = GetResouces<int>("http://gladtao.sinaapp.com/views/a/order.php?r=jsonGetCount&status=" + (int)status);
+
+            string getUrl = string.Format("http://gladtao.sinaapp.com/views/a/order.php?r=jsonOrdered&pi={0}&pc={1}&status={2}", currentPageIndex, countEachPage, (int)status);
+            List<jsonorder> jsonorders = GetResouces<List<jsonorder>>(getUrl);
 
             List<OrderItem> orders = new List<OrderItem>();
-            totalCount = orders.Count;
             foreach (jsonorder order in jsonorders)
             {
                 orders.Add(new OrderItem
@@ -51,7 +53,7 @@ namespace LedaoOrder
         /// <returns></returns>
         public static OrderItem GetOrder(int orderID)
         {
-            jsonorder jsonorder = GetResouces<jsonorder>("http://yiimod.sinaapp.com/views/a/order.php?r=jsonOrderDetail&oid="+orderID);
+            jsonorder jsonorder = GetResouces<jsonorder>("http://gladtao.sinaapp.com/views/a/order.php?r=jsonOrderDetail&oid=" + orderID);
 
             OrderItem order = new OrderItem
             {
@@ -89,7 +91,7 @@ namespace LedaoOrder
         /// <returns></returns>
         public static bool SendOrder(int orderID)
         {
-            bool result = GetResouces<bool>("http://yiimod.sinaapp.com/views/a/order.php?r=jsonSend&oid=" + orderID);
+            bool result = GetResouces<bool>("http://gladtao.sinaapp.com/views/a/order.php?r=jsonSend&oid=" + orderID);
             return result;
         }
 

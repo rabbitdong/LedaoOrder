@@ -83,7 +83,7 @@ namespace LedaoOrder
             else
                 btnPreviousPage.IsEnabled = false;
 
-            if (currentPageIndex == totalPageCount - 1)
+            if (currentPageIndex >= totalPageCount - 1)
                 btnNextPage.IsEnabled = false;
             else
                 btnNextPage.IsEnabled = true;
@@ -135,10 +135,17 @@ namespace LedaoOrder
         {
             BindedEnumItem item = cmbOrderStatus.SelectedItem as BindedEnumItem;
 
+            currentPageIndex = 0;
+            OrderStatus orderStatus = (OrderStatus)item.enumValue;
+            GetAndShowOrders(orderStatus);
+        }
+
+        private void GetAndShowOrders(OrderStatus orderStatus)
+        {
             int totalCount = 0;
             try
             {
-                List<OrderItem> orders = OrderProvider.GetPagedOrders((OrderStatus)item.enumValue, currentPageIndex, countEachPage, out totalCount);
+                List<OrderItem> orders = OrderProvider.GetPagedOrders(orderStatus, currentPageIndex, countEachPage, out totalCount);
                 model = orders.Select(o => new OrderListViewModel
                 {
                     OrderID = o.OrderID,
@@ -161,13 +168,13 @@ namespace LedaoOrder
             {
                 ;
             }
-
         }
 
         private void btnNextPage_Click(object sender, RoutedEventArgs e)
         {   
             currentPageIndex++;
-            btnGetOrder_Click(sender, e);
+            OrderStatus orderStatus = (OrderStatus)(cmbOrderStatus.SelectedItem as BindedEnumItem).enumValue;
+            GetAndShowOrders(orderStatus);
         }
 
         private void btnPreviousPage_Click(object sender, RoutedEventArgs e)
@@ -176,7 +183,8 @@ namespace LedaoOrder
                 return;
 
             currentPageIndex--;
-            btnGetOrder_Click(sender, e);
+            OrderStatus orderStatus = (OrderStatus)(cmbOrderStatus.SelectedItem as BindedEnumItem).enumValue;
+            GetAndShowOrders(orderStatus);
         }
     }
 }
