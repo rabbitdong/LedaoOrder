@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using LedaoOrder.Models;
+using System.Media;
 
 namespace LedaoOrder
 {
@@ -25,6 +26,11 @@ namespace LedaoOrder
         IEnumerable<OrderListViewModel> model = null;
         private int currentPageIndex = 0;
         private int countEachPage = 20;
+
+        private static string hasOrderVoiceFileName = "haveorder.wav";
+        private SoundPlayer player;
+        private DispatcherTimer playTimer;
+        private bool hasNewOrder = false;
 
         public OrderListPage()
         {
@@ -53,6 +59,8 @@ namespace LedaoOrder
                 dgOrder.ItemsSource = model;
                 txtTotalCount.Text = string.Format("总订单数：{0}", totalCount);
                 SetPagedButtonState(totalCount);
+
+                hasNewOrder = orders.Count > 0;
             }
             catch (Exception)
             {
@@ -63,7 +71,12 @@ namespace LedaoOrder
             timer.Tick += dispatcherTimer_Tick;
             timer.Interval = new TimeSpan(0,0,10);
             timer.Start();
+
+            player = new SoundPlayer(hasOrderVoiceFileName);
+            playTimer = new DispatcherTimer();
+            playTimer.Tick += playTimer_Tick;
         }
+
 
         /// <summary>
         /// 计算总页数
@@ -124,6 +137,7 @@ namespace LedaoOrder
                 SetPagedButtonState(totalCount);
                 dgOrder.ItemsSource = model;
                 dgOrder.Items.Refresh();
+                hasNewOrder = orders.Count > 0;
             }
             catch (Exception)
             {
@@ -163,6 +177,9 @@ namespace LedaoOrder
                 dgOrder.ItemsSource = model;
                 dgOrder.Items.Refresh();
                 SetPagedButtonState(totalCount);
+
+                if(orderStatus == OrderStatus.Ordered)
+                    hasNewOrder = orders.Count > 0;
             }
             catch (Exception)
             {
@@ -185,6 +202,14 @@ namespace LedaoOrder
             currentPageIndex--;
             OrderStatus orderStatus = (OrderStatus)(cmbOrderStatus.SelectedItem as BindedEnumItem).enumValue;
             GetAndShowOrders(orderStatus);
+        }
+
+        private void playTimer_Tick(object sender, EventArgs e)
+        {
+            if (hasNewOrder)
+                player.Play();
+            else
+                player.Stop();
         }
     }
 }
