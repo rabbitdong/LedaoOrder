@@ -21,14 +21,24 @@ namespace LedaoOrder
     /// </summary>
     public partial class OrderDetailPage : Page
     {
+        public bool hasNextPageOrderDetails = false;
+        public bool hasPrePageOrderDetails = false;
+
+        //当前页索引，从0开始
+        private int currentPageIndex = 0;
+        private int totalPageCount;
+
+        //每页显示的商品项数目
+        private const int eachPagedItemNumber = 9;
+
+        private OrderItem order;
         private OrderDetailViewModel detailModel;
-        private int numberRowOfOnePage;
 
         public OrderDetailPage(int orderID)
         {
             InitializeComponent();
 
-            OrderItem order = OrderProvider.GetOrder(orderID);
+            order = OrderProvider.GetOrder(orderID);
 
             if (order.Status != OrderStatus.Ordered)
             {
@@ -36,6 +46,7 @@ namespace LedaoOrder
                 btnPrint.Content = "补打订单";
             }
 
+            //转换成页面模型进行处理
             detailModel = new OrderDetailViewModel();
             detailModel.OrderID = order.OrderID;
             detailModel.Receiver = order.Receiver;
@@ -47,9 +58,25 @@ namespace LedaoOrder
             detailModel.Remark = order.Remark;
             detailModel.DetailItems = new List<OrderDetailItemViewModel>();
 
+            totalPageCount = (order.OrderDetails.Count + eachPagedItemNumber - 1) / eachPagedItemNumber;
+            ShowPagedOrderDetail();
+
+            btnPrePage.DataContext = this;
+            btnNextPage.DataContext = this;
+        }
+
+        private void ShowPagedOrderDetail()
+        {
+            int beginIndex = currentPageIndex * eachPagedItemNumber;
+            hasNextPageOrderDetails = order.OrderDetails.Count > (beginIndex + eachPagedItemNumber);
+            hasPrePageOrderDetails = currentPageIndex > 0;
+            int endIndex = hasNextPageOrderDetails ? (beginIndex + eachPagedItemNumber) : order.OrderDetails.Count;
+
             string amountString = string.Empty;
-            foreach (OrderDetailItem orderDetail in order.OrderDetails)
+            detailModel.DetailItems.Clear();
+            for (int i = beginIndex; i < endIndex; ++i)
             {
+                OrderDetailItem orderDetail = order.OrderDetails[i];
                 if (orderDetail.Unit == "斤")
                     amountString = string.Format("{0}{1}", orderDetail.Amount, orderDetail.Unit);
                 else
@@ -64,9 +91,8 @@ namespace LedaoOrder
                 });
             }
 
-            numberRowOfOnePage = 9;
-            int addCount = numberRowOfOnePage - detailModel.DetailItems.Count;
-            if (addCount < numberRowOfOnePage)
+            int addCount = eachPagedItemNumber - (endIndex - beginIndex);
+            if (addCount < eachPagedItemNumber)
             {
                 for (int i = 0; i < addCount; ++i)
                 {
@@ -74,8 +100,11 @@ namespace LedaoOrder
                 }
             }
 
+            if (totalPageCount > 1)
+                txtTitle.Text = string.Format("乐道(水果君)水果订单（{0}）", currentPageIndex + 1);
 
             tbOrderDetail.ItemsSource = detailModel.DetailItems;
+            tbOrderDetail.Items.Refresh();
 
             txtOrderID.Text = string.Format("订 单 号：{0:00000000}", detailModel.OrderID);
             txtUserInfo.Text = string.Format("客　　户：{0}", detailModel.Receiver);
@@ -113,5 +142,29 @@ namespace LedaoOrder
                 txtMsg.Text = "本订单已经发货！";
             }
         }
+
+        /// <summary>
+        /// show the order detail of next page(if there's a next page).
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnNextPage_Click(object sender, RoutedEventArgs e)
+        {
+            if (hasNextPageOrderDetails)
+                currentPageIndex++;
+            ShowPagedOrderDetail();
+        }
+
+        /// <summary>
+        /// show the order detail of previous page(if there's a previous page).
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnPrePage_Click(object sender, RoutedEventArgs e)
+        {
+            if (hasPrePageOrderDetails)
+                currentPageIndex--;
+            ShowPagedOrderDetail();
+        }    
     }
 }

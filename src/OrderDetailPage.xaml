@@ -10,7 +10,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="30" />
+            <RowDefinition Height="50" />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="0">
             <Button Name="btnPrint" Content="打印订单" Click="btnPrint_Click" Margin="5,10,5,10" Padding="10,2,10,2"/>
@@ -24,7 +24,7 @@
                 <RowDefinition Height="20" />
                 <RowDefinition Height="20" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" TextAlignment="Center" VerticalAlignment="Top" FontSize="20">乐道(水果君)水果订单</TextBlock>
+            <TextBlock Grid.Row="0" TextAlignment="Center" VerticalAlignment="Top" FontSize="20" Name="txtTitle">乐道(水果君)水果订单</TextBlock>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -93,7 +93,11 @@
             </DockPanel>
             <TextBlock TextAlignment="Center" Grid.Row="3">微信公众号：gladtao</TextBlock>
             <TextBlock TextAlignment="Center" Grid.Row="4">罗源乐道贸易有限公司. 400-899-0918</TextBlock>
-        </Grid>    
-        <TextBlock Name="txtMsg" Grid.Row="2" />        
+        </Grid>
+        <StackPanel Orientation="Horizontal" Grid.Row="2">
+            <Button Name="btnPrePage" Content="上一页订单" Click="btnPrePage_Click" Margin="5,10,5,10" Padding="10,2,10,2" IsEnabled="{Binding hasPrePageOrderDetail}"/>
+            <Button Name="btnNextPage" Content="下一页订单" Click="btnNextPage_Click" Margin="5,10,5,10" Padding="10,2,10,2" IsEnabled="{Binding hasNextPageOrderDetail}"/>
+            <TextBlock Name="txtMsg"/>
+        </StackPanel>                
     </Grid>
 </Page>
